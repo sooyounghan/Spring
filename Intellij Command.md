@@ -69,6 +69,11 @@
   - Win/Linux: Ctrl + i
 
 -----
+### Create Test
+-----   
+1. Windows : Ctrl + Shift + T
+   
+-----
 ### Refactoring Extract
 -----
 1. 변수 추출하기 (Extract -> Variable)
