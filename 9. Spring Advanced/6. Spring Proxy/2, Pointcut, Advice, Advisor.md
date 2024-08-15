@@ -309,7 +309,7 @@ pointcut.setMappedName("save"); // save인 경우에만 적용
      + 예) ```*xxx*``` 허용
    - JdkRegexMethodPointcut : JDK 정규 표현식 기반으로 포인트컷 매칭
    - TruePointcut : 항상 참 반환
-   - AnnotationMathcingPointcut : 애너테이션으로 매칭
+   - AnnotationMatchingPointcut : 애너테이션으로 매칭
    - AspectJExpressionPointcut : aspectJ 표현식으로 매칭
 
 6. 💡💡💡 ASpectJExpressionPointcut
