@@ -316,7 +316,7 @@ pointcut.setMappedName("save"); // save인 경우에만 적용
    - 실무에서 사용하기도 편리하고 기능도 가장 많음
 
 -----
-### 여러 어드바이저 함꼐 사용
+### 여러 어드바이저 함께 사용
 -----
 1. MultiAdvisorTest
 ```java
@@ -342,7 +342,7 @@ public class MultiAdvisorTest {
     void multiAdvisorTest1() {
         // client -> proxy2(advisor2) -> proxy1(advisor1) -> target
 
-        // Proxy1 생성 (target -> proxy1)
+        // Proxy1 생성 (proxy1 -> target)
         ServiceInterface target = new ServiceImpl();
         ProxyFactory proxyFactory1 = new ProxyFactory(target);
         DefaultPointcutAdvisor advisor1 = new DefaultPointcutAdvisor(Pointcut.TRUE, new Advice1());
