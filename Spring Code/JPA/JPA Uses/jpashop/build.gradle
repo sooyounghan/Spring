@@ -34,6 +34,12 @@ dependencies {
 	// Hibernate6Module
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
 
+	// 💡 Querydsl 추가 (스프링 부트 3.0 이상 : jakarta 주의)
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 
@@ -49,4 +55,10 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+//Querydsl 추가, 자동 생성된 Q클래스 gradle clean으로 제거
+// 💡💡💡 Q File은 컴파일 시점마다 생성되므로 git에 ignore에 제거
+clean {
+	delete file('src/main/generated')
 }
