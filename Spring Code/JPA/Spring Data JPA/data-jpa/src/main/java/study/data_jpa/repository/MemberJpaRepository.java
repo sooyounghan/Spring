@@ -46,4 +46,32 @@ public class MemberJpaRepository {
         return em.createQuery("SELECT COUNT(m) FROM Member m", Long.class)
                 .getSingleResult();
     }
+
+    // 회원과 나이를 기준으로 회원 조회
+    public List<Member> findByUsernameAndAgeGreaterThan(String username, int age) {
+        return em.createQuery("SELECT m FROM Member m WHERE m.username = :username AND m.age > :age", Member.class)
+                .setParameter("username", username)
+                .setParameter("age", age)
+                .getResultList();
+    }
+
+    public List<Member> findByUsername(String username) {
+        return em.createNamedQuery("Member.findByUsername", Member.class)
+                .setParameter("username", username)
+                .getResultList();
+    }
+
+    public List<Member> findByPage(int age, int offset, int limit) {
+        return em.createQuery("SELECT m FROM Member m WHERE m.age = :age ORDER BY m.username DESC", Member.class)
+                 .setParameter("age", age)
+                 .setFirstResult(offset)
+                 .setMaxResults(limit)
+                 .getResultList();
+    }
+
+    public long totalCount(int age) {
+        return em.createQuery("SELECT COUNT(m) FROM Member m WHERE m.age = :age", Long.class)
+                .setParameter("age", age)
+                .getSingleResult();
+    }
 }

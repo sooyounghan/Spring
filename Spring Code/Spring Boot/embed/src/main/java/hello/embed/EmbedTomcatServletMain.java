@@ -32,7 +32,6 @@ public class EmbedTomcatServletMain {
         }
 
         docBaseFile.mkdirs();
-
         // == 코드 추가 종료==
 
         tomcat.addServlet("", "helloServlet", new HelloServlet()); // 서블릿 설정
