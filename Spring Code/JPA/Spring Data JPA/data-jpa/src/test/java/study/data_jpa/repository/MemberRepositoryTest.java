@@ -1,5 +1,6 @@
 package study.data_jpa.repository;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test; // Junit 5
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+    @Autowired EntityManager em;
 
     @Test
     public void testMember() {
@@ -225,5 +227,139 @@ public class MemberRepositoryTest {
         // assertThat(list.getTotalPages()).isEqualTo(2); // 페이지 번호 (1-3 : 1페이지, 4-5 : 2페이지)
         // assertThat(list.isFirst()).isTrue(); // 첫 번쨰 항목(페이지) 인가?
         // assertThat(list.hasNext()).isTrue(); // 다음 페이지가 존재하는가?
+    }
+
+    @Test
+    public void bulkUpdate() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        // when
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+        // em.flush(); // DB에 반영 (UPDATE SQL 같은 연산은 해당 쿼리를 미리 전송)
+        // em.clear(); // 영속성 컨텍스트 초기화
+
+        // then
+        assertThat(resultCount).isEqualTo(3);
+    }
+
+    @Test
+    public void findMemberLazy() {
+        // given
+        // member1 -> teamA
+        // member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        // when (N + 1)
+        // SELECT Member (1)
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); // Proxy
+            System.out.println("member.team = " + member.getTeam().getName()); // LAZY(N) - Proxy 초기화 (SELECT Team)
+        }
+    }
+
+    @Test
+    public void findMemberFetchJoin() {
+        // given
+        // member1 -> teamA
+        // member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Member> members = memberRepository.findMemberFetchJoin();
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); // 순수 Team Entity
+            System.out.println("member.team = " + member.getTeam().getName());
+        }
+    }
+
+    @Test
+    public void findEntityGraphMember() {
+        // given
+        // member1 -> teamA
+        // member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Member> members = memberRepository.findEntityGraphByUsername("member1");
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); // 순수 Team Entity
+            System.out.println("member.team = " + member.getTeam().getName());
+        }
+    }
+
+    @Test
+    public void queryHint() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        // when
+        Member member = memberRepository.findReadOnlyByUsername("member1");
+        member.setUsername("member2");
+
+        em.flush(); // UPDATE 쿼리 미실행
+    }
+
+    @Test
+    public void lock() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        // when
+        List<Member> result = memberRepository.findLockByUsername("member1");
+    }
+
+    @Test
+    public void callCustom() {
+        List<Member> result = memberRepository.findMemberCustom();
     }
 }

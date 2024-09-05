@@ -1,10 +1,11 @@
 package study.data_jpa.repository;
 
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.data_jpa.dto.MemberDto;
 import study.data_jpa.entity.Member;
@@ -13,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
     @Query(name = "Member.findByUsername")
@@ -49,4 +50,35 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Page<Member> findMemberAllCountBy(Pageable pageable);
 
     List<Member> findTop3By();
+
+    @Modifying(clearAutomatically = true) // 벌크 연산 후 영속성 컨텍스트 초기화
+    @Query("UPDATE Member m SET m.age = m.age + 1 WHERE m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
+
+    @Query("SELECT m FROM Member m LEFT JOIN FETCH m.team t")
+    List<Member> findMemberFetchJoin();
+
+    // 공통 메서드 오버라이딩
+    @Override
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findAll();
+
+    // JPQL + 엔티티 그래프
+    // @EntityGraph(attributePaths = {"team"})
+    @EntityGraph("Member.all")
+    @Query("SELECT m FROM Member m")
+    List<Member> findMemberEntityGraph();
+
+    // 메서드 이름 쿼리에서 특히 편리
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findEntityGraphByUsername(@Param("username") String username);
+
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByUsername(String username);
+
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"), forCounting = true)
+    Page<Member> findReadOnlyByUsername(String name, Pageable pageable);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUsername(String username);
 }

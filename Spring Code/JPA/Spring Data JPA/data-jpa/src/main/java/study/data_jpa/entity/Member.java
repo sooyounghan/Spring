@@ -1,20 +1,18 @@
 package study.data_jpa.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
-@Getter
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "username", "age"})
 @NamedQuery(
         name = "Member.findByUsername",
         query = "SELECT m FROM Member m WHERE m.username = :username"
 )
-public class Member {
+@NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
+public class Member extends BaseTimeEntity {
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
