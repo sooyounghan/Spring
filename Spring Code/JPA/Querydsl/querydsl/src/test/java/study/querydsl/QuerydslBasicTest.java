@@ -211,6 +211,7 @@ public class QuerydslBasicTest {
         Assertions.assertThat(tuple.get(member.age.min())).isEqualTo(10);
     }
 
+
     /**
      * 팀의 이름과 각 팀의 평균 연령
      */
@@ -488,7 +489,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void tupleProejction() {
+    public void tupleProjection() {
         List<Tuple> result = queryFactory.select(member.username, member.age)
                 .from(member)
                 .fetch();
@@ -703,5 +704,16 @@ public class QuerydslBasicTest {
         for (String s : result) {
             System.out.println("s = " + s);
         }
+    }
+
+    @Test
+    public void count() {
+        Long totalCount = queryFactory
+                // .select(Wildcard.count) // SELECT COUNT(*)
+                .select(member.count()) // SELECT COUNT(member.id)
+                .from(member)
+                .fetchOne();
+
+        System.out.println("totalCount = " + totalCount);
     }
 }

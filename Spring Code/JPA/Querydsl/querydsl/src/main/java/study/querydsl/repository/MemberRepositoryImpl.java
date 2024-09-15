@@ -170,22 +170,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .limit(pageable.getPageSize()) // limit
                 .fetch();
 
-        long total = queryFactory.select(member)
+        JPAQuery<Long> countQuery = queryFactory.select(member.count()) // 변경 member.count()
                 .from(member)
-                // .leftJoin(member.team, team)
-                .where(
-                        usernameEq(condition.getUsername()),
-                        teamNameEq(condition.getTeamName()),
-                        ageGoe(condition.getAgeGoe()),
-                        ageLoe(condition.getAgeLoe())
-                )
-                .offset(pageable.getOffset()) // offset
-                .limit(pageable.getPageSize()) // limit
-                .fetchCount();
-
-        JPAQuery<Member> countQuery = queryFactory.select(member)
-                .from(member)
-                // .leftJoin(member.team, team)
+                .leftJoin(member.team, team)
                 .where(
                         usernameEq(condition.getUsername()),
                         teamNameEq(condition.getTeamName()),
@@ -193,8 +180,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                         ageLoe(condition.getAgeLoe())
                 );
 
+
         // return new PageImpl<>(content, pageable, total);
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne); // fetchCount -> fetchOne
     }
 
     private BooleanExpression usernameEq(String username) {
