@@ -1,5 +1,5 @@
 -----
-### 💡 포인트컷, 어드바이스, 어드바이저
+### 포인트컷, 어드바이스, 어드바이저
 -----
 1. 포인트컷 (Pointcut)
    - 어디에 부가 기능을 적용할지, 어디에 부가 기능을 적용하지 않을지 판단하는 필터링 로직
@@ -66,12 +66,12 @@ public class AdvisorTest {
     + Advisor 인터페이스의 가장 일반적인 구현체
     + 생성자를 통해 하나의 어드바이스를 넣어주면 됨
     + 어드바이저에는 하나의 포인트 컷과 하나의 어드바이스로 구성
-    + 💡 Pointcut.TRUE : 항상 true를 반환하는 포인트 컷
+    + Pointcut.TRUE : 항상 true를 반환하는 포인트 컷
     + new TimeAdvice() : TimeAdvice 어드바이스 제공
   - proxyFactory.addAdvisor(advisor);
     + 프록시 팩토리에 적용할 어드바이저를 지정
     + 어드바이저는 내부에 포인트컷과 어드바이스를 모두 가지고 있음
-    + 💡 따라서 어디에 어떤 부가 기능을 적용해야 할지, 어드바이저 하나로 알 수 있음
+    + 따라서 어디에 어떤 부가 기능을 적용해야 할지, 어드바이저 하나로 알 수 있음
     + 💡 프록시 팩토리를 사용할 때 어드바이저는 필수
   - 과거에는 proxyFactory.addAdvice(new TimeAdvice())로 어드바이스를 바로 적용했는데, 이는 편의 메서드
     + 결과적으로 해당 메서드 내부에서 DefaultPointcutAdvisor(Pointcut.TRUE, new TimeAdvice())의 어드바이저가 생성
@@ -219,7 +219,7 @@ public class AdvisorTest {
      + 💡 isRuntime(), matches(... args) : isRuntime()의 값이 참이면 matches(... args) 메서드가 대신 호출
        * 동적으로 넘어오는 매개변수를 판단 로직으로 사용 가능
        * 💡 isRunitme()이 false인 경우 클래스의 정적 정보만 사용하므로, 스프링 내부에서 캐싱을 통해 성능 향상이 가능
-       * 💡 그러나, isRuntime()이 true이면, 매개변수가 동적으로 변경된다고 가정하므로 캐싱하지 않음
+       * 그러나, isRuntime()이 true이면, 매개변수가 동적으로 변경된다고 가정하므로 캐싱하지 않음
 
    - DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MyPointcut(), new TimeAdvice());
      + 어드바이저에 직접 구현한 포인트컷 사용
@@ -312,7 +312,7 @@ pointcut.setMappedName("save"); // save인 경우에만 적용
    - AnnotationMatchingPointcut : 애너테이션으로 매칭
    - AspectJExpressionPointcut : aspectJ 표현식으로 매칭
 
-6. 💡💡💡 ASpectJExpressionPointcut
+6. ASpectJExpressionPointcut
    - 실무에서 사용하기도 편리하고 기능도 가장 많음
 
 -----
@@ -423,7 +423,7 @@ void multiAdvisorTest2() {
   ServiceInterface target = new ServiceImpl();
   ProxyFactory proxyFactory = new ProxyFactory(target);
   
-  // 💡 proxy -> advisor2 -> advisor1 이므로 순서 주의
+  // proxy -> advisor2 -> advisor1 이므로 순서 주의
   proxyFactory.addAdvisor(advisor2);
   proxyFactory.addAdvisor(advisor1);
   ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
@@ -452,6 +452,6 @@ void multiAdvisorTest2() {
 ```
    - advisor2, advisor1 순서대로 호출
 
-4. 💡 여러 프록시를 사용할 때와 비교하면 결과는 같지만, 성능은 더 좋음
-5. 💡💡💡 스프링 AOP 적용 수 만큼 프록시가 생성된다고 착각할 수 있지만, 스프링은 AOP를 적용할 때 최적화를 진행해서 하나의 프록시만 만들고, 하나의 프록시에 여러 어드바이저를 적용
-6. 💡💡💡 즉, 하나의 target에 여러 AOP가 적용되어도, 스프링의 AOP는 target마다 하나의 프록시만 생성
+4. 여러 프록시를 사용할 때와 비교하면 결과는 같지만, 성능은 더 좋음
+5. 스프링 AOP 적용 수 만큼 프록시가 생성된다고 착각할 수 있지만, 스프링은 AOP를 적용할 때 최적화를 진행해서 하나의 프록시만 만들고, 하나의 프록시에 여러 어드바이저를 적용
+6. 💡 즉, 하나의 target에 여러 AOP가 적용되어도, 스프링의 AOP는 target마다 하나의 프록시만 생성
