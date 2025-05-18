@@ -36,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
 
 2. 롬복 라이브러리 적용 방법
    - build.gradle에 라이브러리 및 환경 추가
-```groovy
+```gradle
 plugins {
     id 'org.springframework.boot' version '2.3.2.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE' 
